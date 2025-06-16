@@ -7,6 +7,15 @@ import { Separator } from "@/components/ui/separator";
 import { ChevronRight, Home, Book, Grid2x2, Search } from "lucide-react";
 import { edutechData } from "@/data/edutechData";
 
+interface EdutechItem {
+  에듀테크명: string;
+  운영현황: string;
+  주요변경사항및핵심특징: string;
+  공식웹사이트: string;
+  가격정책: string;
+  주요대상: string;
+}
+
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSubCategory, setSelectedSubCategory] = useState('');
@@ -41,11 +50,11 @@ const Index = () => {
   };
 
   const getAllEdutechItems = () => {
-    const allItems: any[] = [];
+    const allItems: (EdutechItem & { 대분류: string; 중분류: string; 소분류: string })[] = [];
     Object.entries(edutechData).forEach(([category, subCategories]) => {
-      Object.entries(subCategories).forEach(([subCategory, items]) => {
-        Object.entries(items).forEach(([itemCategory, itemList]) => {
-          itemList.forEach(item => {
+      Object.entries(subCategories as Record<string, any>).forEach(([subCategory, items]) => {
+        Object.entries(items as Record<string, any>).forEach(([itemCategory, itemList]) => {
+          (itemList as EdutechItem[]).forEach(item => {
             allItems.push({
               ...item,
               대분류: category,
@@ -160,7 +169,7 @@ const Index = () => {
   }
 
   if (selectedCategory && selectedSubCategory) {
-    const items = edutechData[selectedCategory]?.[selectedSubCategory];
+    const items = (edutechData as any)[selectedCategory]?.[selectedSubCategory];
     if (!items) return null;
 
     return (
@@ -193,14 +202,14 @@ const Index = () => {
           </div>
 
           <div className="space-y-6">
-            {Object.entries(items).map(([itemCategory, itemList]) => (
+            {Object.entries(items as Record<string, EdutechItem[]>).map(([itemCategory, itemList]) => (
               <div key={itemCategory} className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border-0">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
                   <Grid2x2 className="w-5 h-5 mr-2 text-blue-600" />
                   {itemCategory}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {itemList.map((item: any, index: number) => (
+                  {itemList.map((item: EdutechItem, index: number) => (
                     <Card key={index} className="hover:shadow-md transition-all duration-300 hover:scale-105 bg-white border-0 shadow-sm">
                       <CardHeader className="pb-3">
                         <div className="flex items-center gap-3 mb-2">
@@ -247,7 +256,7 @@ const Index = () => {
   }
 
   if (selectedCategory) {
-    const subCategories = Object.keys(edutechData[selectedCategory] || {});
+    const subCategories = Object.keys((edutechData as any)[selectedCategory] || {});
     
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50">
@@ -346,7 +355,7 @@ const Index = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .animate-fade-in {
           animation: fadeIn 0.6s ease-out forwards;
         }
